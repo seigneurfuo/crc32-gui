@@ -1,10 +1,13 @@
 import sys
 import os
 import re
+import binascii
+import zlib
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QProgressBar, QTableWidgetItem
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QDir, QThread, Qt
+from PyQt5.QtGui import QColor
 
 
 class MainWindow(QMainWindow):
@@ -52,7 +55,7 @@ class MainWindow(QMainWindow):
         for row_index, file in enumerate(self.files_list):
             self.tableWidget.setItem(row_index, 0, QTableWidgetItem(file.filename))
             self.tableWidget.setItem(row_index, 1, QTableWidgetItem(file.folder_path))
-            self.tableWidget.setItem(row_index, 2, QTableWidgetItem(file.crc32))
+            self.tableWidget.setItem(row_index, 2, QTableWidgetItem(file.crc32_from_name))
 
         self.label.setText("{} éléments".format(len(self.files_list)))
 
@@ -60,7 +63,26 @@ class MainWindow(QMainWindow):
     def event_on_launch_button_clicked(self):
         if self.root_folderpath and os.path.exists(self.root_folderpath):
             print("On Lance !")
-            pass
+
+            for row_index, file in enumerate(self.files_list):
+
+                #self.statusBar().setText(file.filepath)
+
+                crc32_from_name = file.crc32_from_name
+                crc32_from_file = file.get_crc_from_file()
+
+                item = QTableWidgetItem(crc32_from_file)
+
+                if(crc32_from_name):
+                    if crc32_from_file == crc32_from_name:
+                       color = QColor(0, 255, 0)
+                    else:
+                        color = QColor(255, 0, 0)
+                else:
+                    color = QColor(255, 255, 255)
+
+                item.setBackground(color)
+                self.tableWidget.setItem(row_index, 3, item)
 
 
     def recursive_file_list(self):
@@ -69,15 +91,22 @@ class MainWindow(QMainWindow):
                 file_path = os.path.join(root, filename)
                 if filename.endswith(self.includes) and file_path not in self.files_list:
                     file_object = File(file_path)
-                    print(file_object)
-                    self.files_list.append(file_object)
+
+                    # On affiche tout les fichier si coché
+                    if self.checkBox_2.checkState() == Qt.Checked:
+                        if file_object.crc32_from_name:
+                            self.files_list.append(file_object)
+                    else:
+                        self.files_list.append(file_object)
 
 class File():
     def __init__(self, filepath):
         self.filepath = filepath
         self.folder_path = os.path.dirname(self.filepath)
         self.filename = os.path.basename(self.filepath)
-        self.crc32 = self.get_crc_from_name()
+        self.crc32_from_name = self.get_crc_from_name()
+        self.crc32_from_data = None
+        self.state = File
 
     def __repr__(self):
         return self.filepath
@@ -93,9 +122,24 @@ class File():
         split_regex = re.split('([a-f0-9]{8})', self.filename, flags=re.IGNORECASE)
         return None if len(split_regex) < 2 else split_regex[-2]
 
+    def get_crc_from_file(self):
+        # https://www.matteomattei.com/how-to-calculate-the-crc32-of-a-file-in-python/
 
-    def check_crc(self):
-        pass
+        blocksize = 4096
+        with open(self.filepath, 'rb') as f:
+            data = f.read(blocksize)
+            crcvalue = 0
+            while len(data) > 0:
+                crcvalue = zlib.crc32(data, crcvalue)
+                data = f.read(blocksize)
+
+        return format(crcvalue & 0xFFFFFFFF, '08x').upper() # Exemple: a509ae4b
+
+    def is_file_ok(self):
+        return (self.crc32_from_name == self.crc32_from_data)
+
+    def set_state(self, state):
+        self.state = state
 
 
 class ProgressThread(QThread):

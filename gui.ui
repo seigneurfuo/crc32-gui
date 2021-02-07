@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1177</width>
-    <height>305</height>
+    <width>1025</width>
+    <height>279</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,20 +15,14 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0" rowspan="2" colspan="2">
-     <widget class="QTableView" name="tableView"/>
-    </item>
-    <item row="2" column="3">
-     <widget class="QLabel" name="label">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="pushButton_3">
       <property name="text">
-       <string>0 éléments</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <string>... Load folder</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="3">
+    <item row="1" column="0" colspan="3">
      <widget class="QTableWidget" name="tableWidget">
       <property name="font">
        <font>
@@ -75,24 +69,13 @@
       </column>
      </widget>
     </item>
-    <item row="3" column="3">
-     <widget class="QCheckBox" name="checkBox">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>Ne pas vider la liste lorsque j'ajoute un dossier à analyser</string>
+       <string>0 éléments</string>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="pushButton_3">
-      <property name="text">
-       <string>... Load folder</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>Lancer</string>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
     </item>
@@ -103,10 +86,24 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="3">
+    <item row="3" column="1">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>Lancer</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>Ne pas vider la liste lorsque j'ajoute un dossier à analyser</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
      <widget class="QCheckBox" name="checkBox_2">
       <property name="text">
-       <string>Afficher les fichiers sans CRC</string>
+       <string>Ne scanner que les fichier avec CRC</string>
       </property>
       <property name="checked">
        <bool>true</bool>
@@ -120,7 +117,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1177</width>
+     <width>1025</width>
      <height>24</height>
     </rect>
    </property>
