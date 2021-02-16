@@ -15,13 +15,15 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.app_name = "CRC32 GUI"
-        self.app_version = "0.1"
+        self.app_version = "0.1.2"
 
         self.init_ui()
         self.setup_events()
 
         self.root_folderpath = ""
-        self.includes = (".avi", ".mp4", ".mkv", ".ogm", ".mpg")
+        #self.includes = (".avi", ".mp4", ".mkv", ".ogm", ".mpg")
+        includes = self.allowed_extensions.text()
+        self.includes = tuple(includes.replace(" ", "").split(","))
         self.files_list = []
 
 
