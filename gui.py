@@ -22,7 +22,9 @@ class WorkerSignals(QObject):
     progress
         int progress complete,from 0-100
     '''
-    worker_data = pyqtSignal(int, str, tuple)
+
+    main_progression_signal = pyqtSignal(int, str, tuple) # row_index, crc32_from_file, color)
+    current_file_progression = pyqtSignal(int) # pourcentage actuel
 
 
 class Worker(QRunnable):
@@ -42,7 +44,38 @@ class Worker(QRunnable):
     def run(self):
         for row_index, file in enumerate(self.files_list):
             crc32_from_name = file.crc32_from_name
-            crc32_from_file = file.get_crc_from_file()
+            #crc32_from_file = file.get_crc_from_file()
+
+
+            # region ----- Calcul du CRC -----
+            # https://www.matteomattei.com/how-to-calculate-the-crc32-of-a-file-in-python/
+            current_block = 0
+            blocksize = 4096
+            old_percentage = 0
+
+            with open(file.filepath, 'rb') as f:
+                crcvalue = 0
+                data = f.read(blocksize)
+                file_byte_size = os.path.getsize(file.filepath)
+                self.signals.current_file_progression.emit(0)
+
+                while len(data) > 0:
+                    crcvalue = zlib.crc32(data, crcvalue)
+                    data = f.read(blocksize)
+
+                    # region ----- Progression of the current file -----
+                    current_block += blocksize
+                    percentage = int(current_block * (100 / file_byte_size))
+
+                    # Percentage increase only if different (avoid too much refresh
+                    if percentage != old_percentage:
+                        self.signals.current_file_progression.emit(percentage)
+
+                    old_percentage = percentage
+                    # endregion
+
+            crc32_from_file = format(crcvalue & 0xFFFFFFFF, '08x').upper()  # Exemple: a509ae4b
+            # endregion
 
             if (crc32_from_name):
                 if crc32_from_file == crc32_from_name:
@@ -52,7 +85,7 @@ class Worker(QRunnable):
             else:
                 color = (255, 255, 255)
 
-            self.signals.worker_data.emit(row_index, crc32_from_file, color)
+            self.signals.main_progression_signal.emit(row_index, crc32_from_file, color)
 
 
 class MainWindow(QMainWindow):
@@ -138,15 +171,20 @@ class MainWindow(QMainWindow):
 
             # Create thread
             worker = Worker(self.files_list)
-            worker.signals.worker_data.connect(self.file_is_checked_event)
+            worker.signals.main_progression_signal.connect(self.when_file_is_checked)
+            worker.signals.current_file_progression.connect(self.current_file_progression)
 
             # Execute
             self.threadpool.start(worker)
 
 
-    def file_is_checked_event(self, row_index, crc32_from_file, color):
+    def when_file_is_checked(self, row_index, crc32_from_file, color):
         self.update_row_color(row_index, crc32_from_file, color)
         self.update_progress_bar(row_index)
+
+
+    def current_file_progression(self, percentage):
+        self.progressbar_2.setValue(int(percentage))
 
 
     def update_row_color(self, row_index, crc32_from_file, color):
