@@ -94,6 +94,9 @@
         <pointsize>8</pointsize>
        </font>
       </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::SingleSelection</enum>
       </property>
@@ -104,7 +107,7 @@
        <bool>false</bool>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>198</number>
+       <number>32</number>
       </attribute>
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>true</bool>
@@ -115,6 +118,11 @@
       <column>
        <property name="text">
         <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Size</string>
        </property>
       </column>
       <column>
@@ -151,6 +159,13 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="6" column="2">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>Open folder</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

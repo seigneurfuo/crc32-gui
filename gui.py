@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-import binascii
+import platform
 import zlib
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QProgressBar, QTableWidgetItem
@@ -9,11 +9,13 @@ from PyQt5.uic import loadUi
 from PyQt5.QtCore import QDir, QThread, Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool
 from PyQt5.QtGui import QColor
 
+
 class WorkerData():
     def __init__(self):
         self.row_id = None
         self.text = None
         self.bacground_color = None
+
 
 class WorkerSignals(QObject):
     '''
@@ -88,13 +90,20 @@ class Worker(QRunnable):
             self.signals.main_progression_signal.emit(row_index, crc32_from_file, color)
 
 
+class TableWidgetColumns:
+    name = 0
+    size = 1
+    folder = 2
+    saved_crc = 3
+    current_crc = 4
+
+
 class MainWindow(QMainWindow):
     def __init__(self, folderpath):
         super().__init__()
 
-
         self.app_name = "CRC32 GUI"
-        self.app_version = "0.2.0"
+        self.app_version = "0.3.1"
 
         self.init_ui()
         self.setup_events()
@@ -123,6 +132,17 @@ class MainWindow(QMainWindow):
         self.pushButton.clicked.connect(self.event_on_launch_button_clicked)
         self.pushButton_3.clicked.connect(self.event_on_select_folder_button_clicked)
 
+        #
+        self.pushButton_4.clicked.connect(self.on_open_folder_button_click)
+
+
+    def on_open_folder_button_click(self):
+        current_row_index = self.tableWidget.currentRow()
+        if(current_row_index != -1):
+            print(current_row_index)
+            folder_path = self.files_list[current_row_index].folder_path
+            open_filebrowser(folder_path)
+
 
     def event_on_select_folder_button_clicked(self):
         folder_path = QFileDialog.getExistingDirectory(self, "Choisir un dossier pour l'analyse")
@@ -142,9 +162,13 @@ class MainWindow(QMainWindow):
         self.tableWidget.setRowCount(len(self.files_list))
 
         for row_index, file in enumerate(self.files_list):
-            self.tableWidget.setItem(row_index, 0, QTableWidgetItem(file.filename))
-            self.tableWidget.setItem(row_index, 1, QTableWidgetItem(file.folder_path))
-            self.tableWidget.setItem(row_index, 2, QTableWidgetItem(file.crc32_from_name))
+            self.tableWidget.setItem(row_index, TableWidgetColumns.name, QTableWidgetItem(file.filename))
+            self.tableWidget.setItem(row_index, TableWidgetColumns.size, QTableWidgetItem(file.size))
+            self.tableWidget.setItem(row_index, TableWidgetColumns.folder, QTableWidgetItem(file.folder_path))
+            self.tableWidget.setItem(row_index, TableWidgetColumns.saved_crc, QTableWidgetItem(file.crc32_from_name))
+
+        # Right click to open folder
+
 
         self.label.setText("{} éléments".format(len(self.files_list)))
 
@@ -187,10 +211,10 @@ class MainWindow(QMainWindow):
         self.progressbar_2.setValue(int(percentage))
 
 
-    def update_row_color(self, row_index, crc32_from_file, color):
+    def update_row_color(self, row_index, crc32_from_file, color, row_id=TableWidgetColumns.current_crc):
         item = QTableWidgetItem(crc32_from_file)
         item.setBackground(QColor(color[0], color[1], color[2]))
-        self.tableWidget.setItem(row_index, 3, item)
+        self.tableWidget.setItem(row_index, row_id, item)
 
 
     def update_progress_bar(self, row_index):
@@ -203,6 +227,7 @@ class File():
         self.filepath = filepath
         self.folder_path = os.path.dirname(self.filepath)
         self.filename = os.path.basename(self.filepath)
+        self.size = self.get_size()
         self.crc32_from_name = self.get_crc_from_name()
         self.crc32_from_data = None
 
@@ -223,6 +248,27 @@ class File():
         # Regex trouvé dans AnimeCheck
         split_regex = re.split('([a-f0-9]{8})', self.filename, flags=re.IGNORECASE)
         return None if len(split_regex) < 2 else split_regex[-2]
+
+
+    def get_size(self):
+        size_in_bytes = os.path.getsize(self.filepath)
+
+        if size_in_bytes > 1024 * 1024 * 1024:
+            size = int(size_in_bytes / (1024 * 1024 * 1024))
+            label = "Go"
+
+        elif size_in_bytes > 1024 * 1024:
+            size = int(size_in_bytes / (1024 * 1024))
+            label = "Mo"
+
+        elif size_in_bytes > 1024:
+            size = int(size_in_bytes / 1024)
+            label = "Ko"
+        else:
+            size = size_in_bytes
+            label = "o"
+
+        return "{} {}".format(size, label)
 
 
     def get_crc_from_file(self):
@@ -254,6 +300,25 @@ class CustomTableView(QTableView):
 
 def human_sort(data: list):
     return data
+
+def open_filebrowser(path):
+    """Ouvre un explorateur de fichiers à l'adresse indiquée en argument"""
+
+    try:
+        if platform.system() == "Windows":
+            from os import startfile
+            startfile(path)
+
+        elif platform.system() == "Darwin":
+            from subprocess import Popen
+            Popen(["open", path])
+
+        else:
+            from subprocess import Popen
+            Popen(["xdg-open", path])
+
+    except:
+        return None
 
 #recursive_file_list("/home/seigneurfuo/Téléchargements", include=(".avi"))
 
