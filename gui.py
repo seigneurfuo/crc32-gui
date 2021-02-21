@@ -11,6 +11,8 @@ from PyQt5.QtGui import QColor
 
 
 class WorkerData():
+    """"""
+
     def __init__(self):
         self.row_id = None
         self.text = None
@@ -42,8 +44,11 @@ class Worker(QRunnable):
         self.signals = WorkerSignals()
         self.files_list = files_list
 
+
     @pyqtSlot()
     def run(self):
+        """"""
+
         for row_index, file in enumerate(self.files_list):
             crc32_from_name = file.crc32_from_name
             #crc32_from_file = file.get_crc_from_file()
@@ -91,6 +96,8 @@ class Worker(QRunnable):
 
 
 class TableWidgetColumns:
+    """"""
+
     name = 0
     size = 1
     folder = 2
@@ -103,7 +110,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.app_name = "CRC32 GUI"
-        self.app_version = "0.3.1"
+        self.app_version = "0.3.3"
 
         self.init_ui()
         self.setup_events()
@@ -124,11 +131,15 @@ class MainWindow(QMainWindow):
 
 
     def init_ui(self):
+        """"""
+
         loadUi(os.path.join(QDir.currentPath(), 'gui.ui'), self)
         self.setWindowTitle("{} - {}".format(self.app_name, self.app_version))
 
 
     def setup_events(self):
+        """"""
+
         self.pushButton.clicked.connect(self.event_on_launch_button_clicked)
         self.pushButton_3.clicked.connect(self.event_on_select_folder_button_clicked)
 
@@ -137,6 +148,8 @@ class MainWindow(QMainWindow):
 
 
     def on_open_folder_button_click(self):
+        """"""
+
         current_row_index = self.tableWidget.currentRow()
         if(current_row_index != -1):
             print(current_row_index)
@@ -145,6 +158,8 @@ class MainWindow(QMainWindow):
 
 
     def event_on_select_folder_button_clicked(self):
+        """"""
+
         folder_path = QFileDialog.getExistingDirectory(self, "Choisir un dossier pour l'analyse")
         if folder_path and os.path.exists(folder_path):
             self.root_folderpath = folder_path
@@ -158,6 +173,8 @@ class MainWindow(QMainWindow):
 
 
     def update_table(self):
+        """"""
+
         self.tableWidget.clearContents()
         self.tableWidget.setRowCount(len(self.files_list))
 
@@ -167,13 +184,12 @@ class MainWindow(QMainWindow):
             self.tableWidget.setItem(row_index, TableWidgetColumns.folder, QTableWidgetItem(file.folder_path))
             self.tableWidget.setItem(row_index, TableWidgetColumns.saved_crc, QTableWidgetItem(file.crc32_from_name))
 
-        # Right click to open folder
-
-
         self.label.setText("{} éléments".format(len(self.files_list)))
 
 
     def recursive_file_list(self):
+        """"""
+
         for root, directories, filenames in os.walk(self.root_folderpath):
             for filename in human_sort(filenames):
                 file_path = os.path.join(root, filename)
@@ -189,6 +205,8 @@ class MainWindow(QMainWindow):
 
 
     def event_on_launch_button_clicked(self):
+        """"""
+
         if self.root_folderpath and os.path.exists(self.root_folderpath):
             # Init progressbar current value
             self.progressbar.setValue(self.progressbar.minimum())
@@ -203,21 +221,29 @@ class MainWindow(QMainWindow):
 
 
     def when_file_is_checked(self, row_index, crc32_from_file, color):
+        """"""
+
         self.update_row_color(row_index, crc32_from_file, color)
         self.update_progress_bar(row_index)
 
 
     def current_file_progression(self, percentage):
+        """"""
+
         self.progressbar_2.setValue(int(percentage))
 
 
     def update_row_color(self, row_index, crc32_from_file, color, row_id=TableWidgetColumns.current_crc):
+        """"""
+
         item = QTableWidgetItem(crc32_from_file)
         item.setBackground(QColor(color[0], color[1], color[2]))
         self.tableWidget.setItem(row_index, row_id, item)
 
 
     def update_progress_bar(self, row_index):
+        """"""
+
         percentage = (row_index + 1) * (100 / len(self.files_list))
         self.progressbar.setValue(int(percentage))
 
@@ -241,26 +267,30 @@ class File():
 
 
     def exists(self):
+        """"""
+
         return os.path.exists(self.filepath)
 
 
     def get_crc_from_name(self):
+        """"""
+
         # Regex trouvé dans AnimeCheck
         split_regex = re.split('([a-f0-9]{8})', self.filename, flags=re.IGNORECASE)
         return None if len(split_regex) < 2 else split_regex[-2]
 
 
     def get_size(self):
+        """"""
+
         size_in_bytes = os.path.getsize(self.filepath)
 
         if size_in_bytes > 1024 * 1024 * 1024:
             size = int(size_in_bytes / (1024 * 1024 * 1024))
             label = "Go"
-
         elif size_in_bytes > 1024 * 1024:
             size = int(size_in_bytes / (1024 * 1024))
             label = "Mo"
-
         elif size_in_bytes > 1024:
             size = int(size_in_bytes / 1024)
             label = "Ko"
@@ -272,6 +302,8 @@ class File():
 
 
     def get_crc_from_file(self):
+        """"""
+
         # https://www.matteomattei.com/how-to-calculate-the-crc32-of-a-file-in-python/
 
         blocksize = 4096
@@ -286,14 +318,14 @@ class File():
 
 
     def is_file_ok(self):
+        """"""
+
         return (self.crc32_from_name == self.crc32_from_data)
 
 
-class ProgressThread(QThread):
-    pass
-
-
 class CustomTableView(QTableView):
+    """"""
+
     def __init__(self):
         super().__init__()
 
