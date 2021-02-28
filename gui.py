@@ -60,6 +60,8 @@ class Worker(QRunnable):
             blocksize = 4096
             old_percentage = 0
 
+            # TODO: if os.path.isfile(file.filepath):
+
             with open(file.filepath, 'rb') as f:
                 crcvalue = 0
                 data = f.read(blocksize)
@@ -277,7 +279,7 @@ class File():
 
         # Regex trouvé dans AnimeCheck
         split_regex = re.split('([a-f0-9]{8})', self.filename, flags=re.IGNORECASE)
-        return None if len(split_regex) < 2 else split_regex[-2]
+        return None if len(split_regex) < 2 else str(split_regex[-2]).upper()
 
 
     def get_size(self):
