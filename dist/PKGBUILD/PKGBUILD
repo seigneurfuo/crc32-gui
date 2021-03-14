@@ -1,0 +1,25 @@
+# Maintainer: Agnésa Théo <seigneurfuo@protonmail.com>
+# Contributor: Agnésa Théo <seigneurfuo@protonmail.com>
+
+pkgname=crc32-gui
+pkgver=2021.03.14
+pkgrel=1
+pkgdesc=""
+arch=("any")
+url="https://seigneurfuo.wordpress.com"
+license=('NONE')
+groups=("★ seigneurfuo: Paquets persos")
+depends=('python' 'python-pyqt5')
+source=("crc32-gui.py" "gui.ui" "crc32-gui.desktop")
+md5sums=('SKIP'
+		 'SKIP'
+         'SKIP')
+
+package() 
+{
+	mkdir -p "${pkgdir}/opt/${pkgname}"
+
+	install -Dm644 "gui.ui" "${pkgdir}/opt/${pkgname}/gui.ui"
+	install -Dm644 "${pkgname}.py" "${pkgdir}/opt/${pkgname}/${pkgname}.py"
+	install -Dm644 "${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+}

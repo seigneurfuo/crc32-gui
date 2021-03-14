@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         """"""
 
-        loadUi(os.path.join(QDir.currentPath(), 'gui.ui'), self)
+        loadUi(os.path.join(os.path.join(os.path.dirname(__file__)), 'gui.ui'), self)
         self.setWindowTitle("{} - {}".format(self.app_name, self.app_version))
 
 

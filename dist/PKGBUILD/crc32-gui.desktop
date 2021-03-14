@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=CRC32 Gui
+Comment[fr_FR]=Application en zone de notification pour monter les différents partages du NAS
+Exec=python /opt/crc32-gui/crc32-gui.py
+Icon=python
+Terminal=false
+Type=Application
+Categories=Utility;

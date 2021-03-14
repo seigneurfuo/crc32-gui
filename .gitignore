@@ -1,0 +1,6 @@
+.idea
+dist/PKGBUILD/pkg
+dist/PKGBUILD/src
+dist/PKGBUILD/crc32-gui.py
+dist/PKGBUILD/gui.ui
+dist/PKGBUILD/*.pkg.*
