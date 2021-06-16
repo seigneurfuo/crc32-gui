@@ -83,7 +83,7 @@
     <item row="0" column="0">
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
-       <string>... Load folder</string>
+       <string>Choisir un dossier...</string>
       </property>
      </widget>
     </item>
@@ -117,27 +117,27 @@
       </attribute>
       <column>
        <property name="text">
-        <string>Name</string>
+        <string>Nom</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Size</string>
+        <string>Taille</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>In Folder</string>
+        <string>Chemin</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Saved CRC32</string>
+        <string>Empreinte CRC32 du fichier</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Current CRC32</string>
+        <string>Empreinte CRC32 calculée</string>
        </property>
       </column>
      </widget>
@@ -163,7 +163,7 @@
     <item row="6" column="2">
      <widget class="QPushButton" name="pushButton_4">
       <property name="text">
-       <string>Open folder</string>
+       <string>Ouvrir le dossier parent</string>
       </property>
      </widget>
     </item>
