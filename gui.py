@@ -186,15 +186,23 @@ class MainWindow(QMainWindow):
             self.tableWidget.setItem(row_index, TableWidgetColumns.folder, QTableWidgetItem(file.folder_path))
             self.tableWidget.setItem(row_index, TableWidgetColumns.saved_crc, QTableWidgetItem(file.crc32_from_name))
 
+        self.tableWidget.resizeColumnsToContents()
+
         self.label.setText("{} éléments".format(len(self.files_list)))
 
 
     def recursive_file_list(self):
         """"""
 
+        print("Recursive folder:", self.root_folderpath)
+
         for root, directories, filenames in os.walk(self.root_folderpath):
+            print('bite ?')
             for filename in human_sort(filenames):
                 file_path = os.path.join(root, filename)
+
+                print(file_path)
+
                 if filename.endswith(self.includes) and file_path not in self.files_list:
                     file_object = File(file_path)
 
