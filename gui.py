@@ -4,10 +4,10 @@ import re
 import platform
 import zlib
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QProgressBar, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QTableWidgetItem
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QDir, QThread, Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QUrl
-from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QUrl
+from PyQt5.QtGui import QColor, QDesktopServices
 
 
 class WorkerData():
@@ -86,7 +86,7 @@ class Worker(QRunnable):
             crc32_from_file = format(crcvalue & 0xFFFFFFFF, '08x').upper()  # Exemple: a509ae4b
             # endregion
 
-            if (crc32_from_name):
+            if crc32_from_name:
                 if crc32_from_file == crc32_from_name:
                     color = (0, 255, 0)
                 else:
@@ -166,7 +166,7 @@ class MainWindow(QMainWindow):
         if(current_row_index != -1):
             print(current_row_index)
             folder_path = self.files_list[current_row_index].folder_path
-            open_filebrowser(folder_path)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(folder_path))
 
 
     def event_on_select_folder_button_clicked(self):
@@ -207,7 +207,6 @@ class MainWindow(QMainWindow):
         print("Recursive folder:", self.root_folderpath)
 
         for root, directories, filenames in os.walk(self.root_folderpath):
-            print('bite ?')
             for filename in human_sort(filenames):
                 file_path = os.path.join(root, filename)
 
@@ -371,8 +370,6 @@ def open_filebrowser(path):
 
     except:
         return None
-
-#recursive_file_list("/home/seigneurfuo/Téléchargements", include=(".avi"))
 
 def main():
     application = QApplication(sys.argv)
