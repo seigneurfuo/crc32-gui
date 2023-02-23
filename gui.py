@@ -6,7 +6,7 @@ import zlib
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QProgressBar, QTableWidgetItem
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QDir, QThread, Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool
+from PyQt5.QtCore import QDir, QThread, Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QUrl
 from PyQt5.QtGui import QColor
 
 
@@ -16,7 +16,7 @@ class WorkerData():
     def __init__(self):
         self.row_id = None
         self.text = None
-        self.bacground_color = None
+        self.background_color = None
 
 
 class WorkerSignals(QObject):
@@ -120,7 +120,7 @@ class MainWindow(QMainWindow):
         self.threadpool = QThreadPool()
 
         self.root_folderpath = ""
-        #self.includes = (".avi", ".mp4", ".mkv", ".ogm", ".mpg")
+
         includes = self.allowed_extensions.text()
         self.includes = tuple(includes.replace(" ", "").split(","))
         self.files_list = []
@@ -138,6 +138,8 @@ class MainWindow(QMainWindow):
         loadUi(os.path.join(os.path.join(os.path.dirname(__file__)), 'gui.ui'), self)
         self.setWindowTitle("{} - {}".format(self.app_name, self.app_version))
 
+        self.setAcceptDrops(True)
+
 
     def setup_events(self):
         """"""
@@ -147,6 +149,14 @@ class MainWindow(QMainWindow):
 
         #
         self.pushButton_4.clicked.connect(self.on_open_folder_button_click)
+
+    def dragEnterEvent(self, event):
+
+        folderpath = QUrl(event.mimeData().text()).toLocalFile()
+
+        self.root_folderpath = folderpath
+        self.recursive_file_list()
+        self.update_table()
 
 
     def on_open_folder_button_click(self):

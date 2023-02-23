@@ -1,2 +1,3 @@
 - Ajouter la vérification du CRC dans un thread à part (pour ne pas bloquer l'affichage).
 - Ajout d'une fenêtre de rapport à la fin du scan
+- Ajout un bouton stop
