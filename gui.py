@@ -4,10 +4,10 @@ import re
 import platform
 import zlib
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QTableWidgetItem
-from PyQt5.uic import loadUi
-from PyQt5.QtCore import Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QUrl
-from PyQt5.QtGui import QColor, QDesktopServices
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableView, QFileDialog, QTableWidgetItem
+from PyQt6.uic import loadUi
+from PyQt6.QtCore import Qt, QObject, QRunnable, pyqtSignal, pyqtSlot, QThreadPool, QUrl
+from PyQt6.QtGui import QColor, QDesktopServices
 
 
 class WorkerData():
@@ -176,7 +176,7 @@ class MainWindow(QMainWindow):
         if folder_path and os.path.exists(folder_path):
             self.root_folderpath = folder_path
 
-            if self.checkBox.checkState() != Qt.Checked:
+            if self.checkBox.checkState() != Qt.CheckState.Checked:
                 self.files_list.clear()
 
             # Et on liste les fichiers -> voir vue personalisée ?
@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
                     file_object = File(file_path)
 
                     # On affiche tout les fichier si coché
-                    if self.checkBox_2.checkState() == Qt.Checked:
+                    if self.checkBox_2.checkState() == Qt.CheckState.Checked:
                         if file_object.crc32_from_name:
                             self.files_list.append(file_object)
                     else:
@@ -380,7 +380,7 @@ def main():
 
     mainwindow = MainWindow(folderpath)
     mainwindow.show()
-    application.exec_()
+    application.exec()
 
 if __name__ == "__main__":
     main()
